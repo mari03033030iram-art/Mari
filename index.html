@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daily Plan FINAL</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--text:#171717;--muted:#777;--line:#e6e6e6;
+  --soft:#f0f1f3;--dark:#222;--ok:#eaf7ee;--warn:#fff4dc;--danger:#f8eeee;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+  background:var(--bg);color:var(--text)
+}
+.wrap{max-width:900px;margin:auto;padding:18px 14px 108px}
+h1{font-size:27px;margin:6px 2px 18px}
+h2{font-size:18px;margin:0 0 12px}
+h3{font-size:15px;margin:16px 0 8px}
+.card{
+  background:var(--card);border-radius:18px;padding:16px;margin:12px 0;
+  box-shadow:0 2px 12px rgba(0,0,0,.04)
+}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.muted{font-size:12px;color:var(--muted);line-height:1.5}
+.pill{font-size:12px;background:var(--soft);padding:5px 9px;border-radius:999px;font-weight:700}
+button,.btn{
+  border:0;border-radius:12px;padding:10px 12px;font-weight:700;background:#eee;color:#222
+}
+.primary{background:#222;color:white}
+.danger{background:var(--danger);color:#7a3030}
+.small{padding:7px 9px;font-size:12px}
+input,select,textarea{
+  width:100%;border:1px solid #ddd;border-radius:11px;padding:10px;font-size:15px;background:#fff
+}
+textarea{min-height:90px;font-family:inherit;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:110px 1fr 150px;gap:8px}
+.grid4{display:grid;grid-template-columns:95px 1fr 130px 120px;gap:8px}
+.formrow{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin:9px 0}
+.formrow label{font-size:13px;font-weight:700}
+.schedule-head,.schedule-row{
+  display:grid;grid-template-columns:90px 1fr 95px 44px 110px;
+  gap:8px;align-items:center
+}
+.schedule-head{
+  font-size:12px;color:var(--muted);font-weight:800;padding:4px 0 8px;border-bottom:1px solid var(--line)
+}
+.schedule-row{padding:10px 0;border-bottom:1px solid var(--line)}
+.schedule-row:last-child{border-bottom:none}
+.schedule-row input[type=checkbox]{width:22px;height:22px;margin:auto}
+.person{font-size:12px;font-weight:800;background:#f1f1f1;border-radius:999px;padding:4px 8px;text-align:center}
+.done{opacity:.55;text-decoration:line-through}
+.approved{font-size:11px;background:var(--ok);padding:5px 7px;border-radius:999px;font-weight:800;text-align:center}
+.unapproved{font-size:11px;background:var(--warn);padding:5px 7px;border-radius:999px;font-weight:800;text-align:center}
+.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:12px}
+.tabbtn{white-space:nowrap;border-radius:999px;padding:8px 12px;background:#eee;font-size:13px}
+.tabbtn.active{background:#222;color:#fff}
+.month-item,.family-item{
+  display:grid;grid-template-columns:24px 1fr 105px;gap:10px;align-items:start;
+  padding:11px 0;border-bottom:1px solid var(--line)
+}
+.month-item:last-child,.family-item:last-child{border-bottom:none}
+.badge{display:inline-block;font-size:11px;background:#eee;border-radius:999px;padding:4px 7px;margin-right:5px}
+.original{
+  background:#fafafa;border:1px solid #e7e7e7;border-radius:14px;padding:12px;margin-top:10px
+}
+.tab-radio{position:absolute;opacity:0;pointer-events:none}
+.view{display:none}
+#tab-today:checked ~ .wrap #todayView,
+#tab-week:checked ~ .wrap #weekView,
+#tab-family:checked ~ .wrap #familyView,
+#tab-month:checked ~ .wrap #monthView,
+#tab-settings:checked ~ .wrap #settingsView{display:block}
+.footer{
+  position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);
+  backdrop-filter:blur(12px);border-top:1px solid #e7e7e7;
+  padding:10px 8px max(10px,env(safe-area-inset-bottom));z-index:50
+}
+.footer-inner{max-width:900px;margin:auto;display:flex;gap:5px}
+.nav{
+  flex:1;text-align:center;border-radius:11px;padding:10px 4px;background:#eee;font-size:12px;font-weight:800
+}
+#tab-today:checked ~ .footer label[for=tab-today],
+#tab-week:checked ~ .footer label[for=tab-week],
+#tab-family:checked ~ .footer label[for=tab-family],
+#tab-month:checked ~ .footer label[for=tab-month],
+#tab-settings:checked ~ .footer label[for=tab-settings]{background:#222;color:#fff}
+.hidden{display:none!important}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+@media(max-width:650px){
+  .schedule-head,.schedule-row{grid-template-columns:72px 1fr 64px 38px 88px;gap:6px}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .formrow{grid-template-columns:100px 1fr}
+  .person{padding:4px 5px}
+}
+</style>
+</head>
+<body>
+
+<input class="tab-radio" type="radio" name="mainTab" id="tab-today" checked>
+<input class="tab-radio" type="radio" name="mainTab" id="tab-week">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-family">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-month">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-settings">
+
+<div class="wrap">
+<h1>Daily Plan</h1>
+
+<section id="todayView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>今日の予定</h2>
+      <span class="pill" id="todayLabel"></span>
+    </div>
+    <div class="tabs" id="todayPersonTabs"></div>
+    <div class="schedule-head">
+      <div>時間</div><div>項目</div><div>誰</div><div>✓</div><div>承認</div>
+    </div>
+    <div id="todayRows"></div>
+
+    <hr>
+    <button class="btn" id="toggleTodayEdit">今日だけ変更・追加</button>
+    <div id="todayEditBox" class="hidden">
+      <h3>今日だけの変更</h3>
+      <div class="grid4">
+        <input id="todayTime" placeholder="時間 例 5:00">
+        <input id="todayItem" placeholder="項目">
+        <select id="todayPerson"></select>
+        <select id="todayApprover"></select>
+      </div>
+      <button class="primary" id="addTodayOverride" style="margin-top:8px">今日だけ追加</button>
+      <div class="original">
+        <div class="muted">基本スケジュールは消えません。今日だけ追加した予定はここに上乗せされます。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>今日のメモ</h2>
+    <textarea id="dailyMemo" placeholder="持ち物、連絡事項、注意点など"></textarea>
+    <button class="btn" id="saveMemo" style="margin-top:8px">保存</button>
+  </div>
+</section>
+
+<section id="weekView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>基本スケジュール</h2>
+      <span class="pill">月〜日</span>
+    </div>
+    <div class="tabs" id="weekdayTabs"></div>
+    <div class="tabs" id="weekPersonTabs"></div>
+    <div id="weekRows"></div>
+
+    <hr>
+    <h3>基本スケジュールに追加</h3>
+    <div class="grid4">
+      <input id="baseTime" placeholder="時間">
+      <input id="baseItem" placeholder="項目">
+      <select id="basePerson"></select>
+      <select id="baseApprover"></select>
+    </div>
+    <button class="primary" id="addBase" style="margin-top:8px">追加</button>
+  </div>
+</section>
+
+<section id="familyView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>家族の予定</h2>
+      <span class="pill">今日</span>
+    </div>
+    <div class="tabs" id="familyFilterTabs"></div>
+    <div id="familyRows"></div>
+  </div>
+</section>
+
+<section id="monthView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>月の予定</h2>
+      <input id="monthPicker" type="month" style="max-width:170px">
+    </div>
+    <div class="grid3">
+      <input id="monthDate" type="date">
+      <input id="monthItem" placeholder="時間未定でもOK">
+      <select id="monthPerson"></select>
+    </div>
+    <button class="primary" id="addMonth" style="margin-top:8px">月予定を追加</button>
+    <div id="monthRows" style="margin-top:12px"></div>
+  </div>
+</section>
+
+<section id="settingsView" class="view">
+  <div class="card">
+    <h2>家族メンバー</h2>
+    <div id="memberEditor"></div>
+    <div class="grid2">
+      <input id="newMember" placeholder="名前">
+      <button class="btn" id="addMember">＋ 家族を追加</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>承認設定</h2>
+    <div class="formrow"><label>承認者1</label><input id="approver1"></div>
+    <div class="formrow"><label>承認者2</label><input id="approver2"></div>
+    <div class="formrow"><label>デフォルト</label><select id="defaultApprover"></select></div>
+    <button class="primary" id="saveApprovers">設定を保存</button>
+    <p class="muted">新しく追加する予定にはデフォルト承認者が自動で入ります。必要な予定だけ後から変更できます。</p>
+  </div>
+
+  <div class="card">
+    <h2>データ</h2>
+    <button class="danger" id="resetDemo">すべての入力データを初期化</button>
+  </div>
+</section>
+</div>
+
+<div class="footer"><div class="footer-inner">
+<label class="nav" for="tab-today">今日</label>
+<label class="nav" for="tab-week">週間</label>
+<label class="nav" for="tab-family">家族</label>
+<label class="nav" for="tab-month">月</label>
+<label class="nav" for="tab-settings">設定</label>
+</div></div>
+
+<script>
+const KEY="daily_plan_final_v1";
+const dayDefs=[
+  {key:"mon",label:"月",js:1},{key:"tue",label:"火",js:2},{key:"wed",label:"水",js:3},
+  {key:"thu",label:"木",js:4},{key:"fri",label:"金",js:5},{key:"sat",label:"土",js:6},{key:"sun",label:"日",js:0}
+];
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const monthKey=()=>new Date().toISOString().slice(0,7);
+const todayDay=()=>dayDefs.find(d=>d.js===new Date().getDay())?.key || "mon";
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+
+function seed(){
+  const s={
+    members:[],
+    approvers:[],
+    defaultApprover:"未承認",
+    base:{},daily:{},monthly:{}
+  };
+  for(const d of dayDefs) s.base[d.key]=[];
+  s.daily[todayISO()]={
+    memo:"",
+    done:{},
+    approvals:{},
+    overrides:[]
+  };
+  s.monthly[monthKey()]=[];
+  return s;
+}
+
+let state=JSON.parse(localStorage.getItem(KEY)||"null")||seed();
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function ensureDaily(){
+  const k=todayISO();
+  if(!state.daily[k]) state.daily[k]={memo:"",done:{},approvals:{},overrides:[]};
+  if(!state.daily[k].overrides) state.daily[k].overrides=[];
+  return state.daily[k];
+}
+let todayFilter="All", weekDay="mon", weekPerson="All", familyFilter="All";
+
+function optionHTML(list,selected){
+  return list.map(x=>`<option ${x===selected?"selected":""}>${esc(x)}</option>`).join("");
+}
+function populateSelects(){
+  const persons=state.members.length ? state.members : ["未設定"];
+  ["todayPerson","basePerson","monthPerson"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=optionHTML(persons,persons[0]);
+  });
+  const approverOptions=[...state.approvers,"未承認"];
+  ["todayApprover","baseApprover"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=optionHTML(approverOptions,state.defaultApprover || "未承認");
+  });
+}
+function todayItems(){
+  const base=state.base[todayDay()]||[];
+  const daily=ensureDaily();
+  return [...base.map((x,i)=>({...x,_id:"b"+i,_source:"base"})),
+          ...daily.overrides.map((x,i)=>({...x,_id:"o"+i,_source:"override"}))]
+    .sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
+}
+function renderPersonTabs(id,current,setter){
+  const el=document.getElementById(id);
+  const vals=["All",...state.members];
+  el.innerHTML=vals.map(x=>`<button class="tabbtn ${x===current?"active":""}" data-v="${esc(x)}">${x==="All"?"全員":esc(x)}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>setter(b.dataset.v));
+}
+function renderToday(){
+  const d=dayDefs.find(x=>x.key===todayDay());
+  document.getElementById("todayLabel").textContent=d.label+"曜日";
+  renderPersonTabs("todayPersonTabs",todayFilter,v=>{todayFilter=v;renderToday()});
+  const daily=ensureDaily();
+  let items=todayItems();
+  if(todayFilter!=="All") items=items.filter(x=>x.person===todayFilter);
+  const box=document.getElementById("todayRows");
+  box.innerHTML=items.length?items.map(x=>{
+    const done=!!daily.done[x._id];
+    const appr=daily.approvals[x._id] ?? x.approver ?? state.defaultApprover;
+    return `<div class="schedule-row ${done?"done":""}">
+      <div>${esc(x.time||"—")}</div>
+      <div><b>${esc(x.item)}</b>${x._source==="override"?'<div class="muted">今日だけ</div>':""}</div>
+      <div class="person">${esc(x.person)}</div>
+      <input type="checkbox" ${done?"checked":""} onchange="setDone('${x._id}',this.checked)">
+      <select onchange="setApproval('${x._id}',this.value)">${optionHTML([...state.approvers,"未承認"],appr)}</select>
+    </div>`
+  }).join(""):`<div class="muted" style="padding:14px 0">予定はありません。</div>`;
+  document.getElementById("dailyMemo").value=daily.memo||"";
+}
+window.setDone=(id,val)=>{ensureDaily().done[id]=val;save();renderToday();renderFamily()};
+window.setApproval=(id,val)=>{ensureDaily().approvals[id]=val;save();renderToday();renderFamily()};
+
+function renderWeek(){
+  const tabs=document.getElementById("weekdayTabs");
+  tabs.innerHTML=dayDefs.map(d=>`<button class="tabbtn ${d.key===weekDay?"active":""}" data-day="${d.key}">${d.label}</button>`).join("");
+  tabs.querySelectorAll("button").forEach(b=>b.onclick=()=>{weekDay=b.dataset.day;renderWeek()});
+  renderPersonTabs("weekPersonTabs",weekPerson,v=>{weekPerson=v;renderWeek()});
+  let arr=state.base[weekDay]||[];
+  if(weekPerson!=="All") arr=arr.filter(x=>x.person===weekPerson);
+  document.getElementById("weekRows").innerHTML=arr.length?arr.map((x,i)=>`
+    <div class="schedule-row">
+      <div>${esc(x.time||"—")}</div>
+      <div><b>${esc(x.item)}</b></div>
+      <div class="person">${esc(x.person)}</div>
+      <div></div>
+      <div><button class="small danger" onclick="deleteBase(${i})">削除</button></div>
+    </div>`).join(""):`<div class="muted" style="padding:14px 0">この曜日の基本予定はありません。</div>`;
+}
+window.deleteBase=i=>{
+  let arr=state.base[weekDay]||[];
+  const visible=weekPerson==="All"?arr:arr.filter(x=>x.person===weekPerson);
+  const target=visible[i];
+  const idx=arr.findIndex(x=>x===target);
+  if(idx>=0) arr.splice(idx,1);
+  save();renderWeek();renderToday();renderFamily();
+};
+
+function renderFamily(){
+  renderPersonTabs("familyFilterTabs",familyFilter,v=>{familyFilter=v;renderFamily()});
+  let arr=todayItems();
+  if(familyFilter!=="All") arr=arr.filter(x=>x.person===familyFilter);
+  const daily=ensureDaily();
+  document.getElementById("familyRows").innerHTML=arr.length?arr.map(x=>{
+    const appr=daily.approvals[x._id] ?? x.approver ?? state.defaultApprover;
+    return `<div class="family-item">
+      <input type="checkbox" ${daily.done[x._id]?"checked":""} onchange="setDone('${x._id}',this.checked)">
+      <div>
+        <b>${esc(x.time||"—")}　${esc(x.item)}</b>
+        <div class="muted"><span class="badge">${esc(x.person)}</span>${esc(appr)}</div>
+      </div>
+      <span class="${appr==="未承認"?"unapproved":"approved"}">${esc(appr)}</span>
+    </div>`
+  }).join(""):`<div class="muted">予定はありません。</div>`;
+}
+
+function renderMonth(){
+  const picker=document.getElementById("monthPicker");
+  if(!picker.value) picker.value=monthKey();
+  const k=picker.value;
+  if(!state.monthly[k]) state.monthly[k]=[];
+  const arr=state.monthly[k];
+  document.getElementById("monthRows").innerHTML=arr.length?arr.map((x,i)=>`
+    <div class="month-item ${x.done?"done":""}">
+      <input type="checkbox" ${x.done?"checked":""} onchange="toggleMonth(${i},this.checked)">
+      <div><b>${esc(x.item)}</b><div class="muted"><span class="badge">${esc(x.person)}</span>${x.date?esc(x.date):"日付未定"}</div></div>
+      <button class="small danger" onclick="deleteMonth(${i})">削除</button>
+    </div>`).join(""):`<div class="muted" style="padding:14px 0">この月の予定はありません。</div>`;
+}
+window.toggleMonth=(i,v)=>{const k=document.getElementById("monthPicker").value;state.monthly[k][i].done=v;save();renderMonth()};
+window.deleteMonth=i=>{const k=document.getElementById("monthPicker").value;state.monthly[k].splice(i,1);save();renderMonth()};
+
+function renderSettings(){
+  document.getElementById("memberEditor").innerHTML=state.members.map((m,i)=>`
+    <div class="formrow"><label>家族 ${i+1}</label><div class="grid2"><input value="${esc(m)}" onchange="renameMember(${i},this.value)"><button class="small danger" onclick="removeMember(${i})">削除</button></div></div>
+  `).join("");
+  document.getElementById("approver1").value=state.approvers[0]||"";
+  document.getElementById("approver2").value=state.approvers[1]||"";
+  document.getElementById("defaultApprover").innerHTML=optionHTML([...state.approvers,"未承認"],state.defaultApprover || "未承認");
+}
+window.renameMember=(i,v)=>{
+  const old=state.members[i], nv=v.trim()||old;
+  state.members[i]=nv;
+  Object.values(state.base).flat().forEach(x=>{if(x.person===old)x.person=nv});
+  Object.values(state.daily).forEach(d=>d.overrides?.forEach(x=>{if(x.person===old)x.person=nv}));
+  Object.values(state.monthly).flat().forEach(x=>{if(x.person===old)x.person=nv});
+  save();populateSelects();renderToday();renderWeek();renderFamily();renderMonth();renderSettings();
+};
+window.removeMember=i=>{if(state.members.length<=1)return; state.members.splice(i,1);save();populateSelects();renderSettings()};
+
+document.getElementById("toggleTodayEdit").onclick=()=>document.getElementById("todayEditBox").classList.toggle("hidden");
+document.getElementById("addTodayOverride").onclick=()=>{
+  const item=document.getElementById("todayItem").value.trim(); if(!item)return alert("項目を入力してください");
+  ensureDaily().overrides.push({
+    time:document.getElementById("todayTime").value.trim(),
+    item,person:document.getElementById("todayPerson").value==="未設定" ? "" : document.getElementById("todayPerson").value,
+    approver:document.getElementById("todayApprover").value
+  });
+  document.getElementById("todayItem").value=""; document.getElementById("todayTime").value="";
+  save();renderToday();renderFamily();
+};
+document.getElementById("saveMemo").onclick=()=>{ensureDaily().memo=document.getElementById("dailyMemo").value;save();alert("保存しました")};
+document.getElementById("addBase").onclick=()=>{
+  const item=document.getElementById("baseItem").value.trim(); if(!item)return alert("項目を入力してください");
+  state.base[weekDay].push({
+    time:document.getElementById("baseTime").value.trim(),
+    item,person:document.getElementById("basePerson").value==="未設定" ? "" : document.getElementById("basePerson").value,
+    approver:document.getElementById("baseApprover").value
+  });
+  document.getElementById("baseItem").value="";document.getElementById("baseTime").value="";
+  save();renderWeek();renderToday();renderFamily();
+};
+document.getElementById("addMonth").onclick=()=>{
+  const item=document.getElementById("monthItem").value.trim();if(!item)return alert("予定を入力してください");
+  const k=document.getElementById("monthPicker").value||monthKey(); if(!state.monthly[k])state.monthly[k]=[];
+  state.monthly[k].push({date:document.getElementById("monthDate").value,item,person:document.getElementById("monthPerson").value==="未設定" ? "" : document.getElementById("monthPerson").value,done:false});
+  document.getElementById("monthItem").value="";document.getElementById("monthDate").value="";
+  save();renderMonth();
+};
+document.getElementById("monthPicker").onchange=renderMonth;
+document.getElementById("addMember").onclick=()=>{
+  const v=document.getElementById("newMember").value.trim();if(!v)return;
+  state.members.push(v);document.getElementById("newMember").value="";save();populateSelects();renderSettings()
+};
+document.getElementById("saveApprovers").onclick=()=>{
+  const a1=document.getElementById("approver1").value.trim(),a2=document.getElementById("approver2").value.trim();
+  state.approvers=[a1,a2].filter(Boolean);
+  state.defaultApprover=document.getElementById("defaultApprover").value;
+  save();populateSelects();renderSettings();renderToday();alert("承認設定を保存しました");
+};
+document.getElementById("resetDemo").onclick=()=>{if(confirm("すべての入力データを初期化しますか？")){state=seed();save();location.reload()}};
+
+populateSelects();
+renderToday();renderWeek();renderFamily();renderMonth();renderSettings();
+</script>
+</body>
+</html>
