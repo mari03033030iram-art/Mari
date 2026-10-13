@@ -1,0 +1,940 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Daily Plan</title>
+<style>
+:root{
+  --bg:#f6f7f9;--card:#fff;--text:#171717;--muted:#777;--line:#e6e6e6;
+  --soft:#f0f1f3;--dark:#222;--ok:#eaf7ee;--warn:#fff4dc;--danger:#f8eeee;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+  background:var(--bg);color:var(--text)
+}
+.wrap{max-width:900px;margin:auto;padding:18px 14px 108px}
+h1{font-size:27px;margin:6px 2px 18px}
+h2{font-size:18px;margin:0 0 12px}
+h3{font-size:15px;margin:16px 0 8px}
+.card{
+  background:var(--card);border-radius:18px;padding:16px;margin:12px 0;
+  box-shadow:0 2px 12px rgba(0,0,0,.04)
+}
+.row-between{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.muted{font-size:12px;color:var(--muted);line-height:1.5}
+.pill{font-size:12px;background:var(--soft);padding:5px 9px;border-radius:999px;font-weight:700}
+button,.btn{
+  border:0;border-radius:12px;padding:10px 12px;font-weight:700;background:#eee;color:#222
+}
+.primary{background:#222;color:white}
+.danger{background:var(--danger);color:#7a3030}
+.small{padding:7px 9px;font-size:12px}
+input,select,textarea{
+  width:100%;border:1px solid #ddd;border-radius:11px;padding:10px;font-size:15px;background:#fff
+}
+textarea{min-height:90px;font-family:inherit;resize:vertical}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid3{display:grid;grid-template-columns:110px 1fr 150px;gap:8px}
+.grid4{display:grid;grid-template-columns:95px 1fr 130px 120px;gap:8px}
+.formrow{display:grid;grid-template-columns:120px 1fr;gap:10px;align-items:center;margin:9px 0}
+.formrow label{font-size:13px;font-weight:700}
+.schedule-head,.schedule-row{
+  display:grid;grid-template-columns:92px minmax(145px,1fr) 82px 52px 42px 102px;
+  gap:8px;align-items:center
+}
+.schedule-head{
+  font-size:12px;color:var(--muted);font-weight:800;padding:4px 0 8px;border-bottom:1px solid var(--line)
+}
+.schedule-head>div,.schedule-row>div{display:flex;align-items:center}
+.schedule-head>div:nth-child(3),
+.schedule-head>div:nth-child(4),
+.schedule-head>div:nth-child(5),
+.schedule-head>div:nth-child(6){justify-content:center}
+.schedule-row>div:nth-child(3),
+.schedule-row>div:nth-child(4),
+.schedule-row>div:nth-child(5),
+.schedule-row>div:nth-child(6){justify-content:center}
+.schedule-row{padding:10px 0;border-bottom:1px solid var(--line)}
+.schedule-row:last-child{border-bottom:none}
+.points-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 16px}
+.points-box{background:#f7f7f7;border-radius:14px;padding:12px;text-align:center}
+.points-num{font-size:24px;font-weight:800}
+.points-history{border-top:1px solid var(--line);margin-top:8px}
+.points-history-row{display:grid;grid-template-columns:1fr auto;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.reward-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.point-pill{display:inline-block;font-size:11px;font-weight:800;background:#eef3ff;padding:4px 7px;border-radius:999px;margin-left:5px}
+.ranking-list{margin-top:8px}
+.ranking-row{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;padding:13px 4px;border-bottom:1px solid var(--line)}
+.ranking-row:last-child{border-bottom:none}
+.rank-num{font-size:20px;font-weight:900;text-align:center}
+.rank-points{font-size:18px;font-weight:900}
+.schedule-row input[type=checkbox]{width:22px;height:22px;margin:auto;justify-self:center}
+.person{font-size:12px;font-weight:800;background:#f1f1f1;border-radius:999px;padding:4px 8px;text-align:center}
+.done{opacity:.55;text-decoration:line-through}
+.approved{font-size:11px;background:var(--ok);padding:5px 7px;border-radius:999px;font-weight:800;text-align:center}
+.unapproved{font-size:11px;background:var(--warn);padding:5px 7px;border-radius:999px;font-weight:800;text-align:center}
+.tabs{display:flex;gap:7px;overflow:auto;margin-bottom:12px}
+.tabbtn{white-space:nowrap;border-radius:999px;padding:8px 12px;background:#eee;font-size:13px}
+.tabbtn.active{background:#222;color:#fff}
+.month-toolbar{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
+.month-picker-wrap{display:flex;align-items:center;gap:8px}
+.month-picker-wrap label{font-size:12px;font-weight:800;color:var(--muted);white-space:nowrap}
+.month-entry-grid{display:grid;grid-template-columns:150px 120px 1fr 140px;column-gap:14px;row-gap:12px;align-items:center}
+.month-entry-grid input,.month-entry-grid select{min-width:0}
+.month-item,.family-item{
+  display:grid;grid-template-columns:24px 1fr 105px;gap:10px;align-items:start;
+  padding:11px 0;border-bottom:1px solid var(--line)
+}
+.month-item:last-child,.family-item:last-child{border-bottom:none}
+.badge{display:inline-block;font-size:11px;background:#eee;border-radius:999px;padding:4px 7px;margin-right:5px}
+.original{
+  background:#fafafa;border:1px solid #e7e7e7;border-radius:14px;padding:12px;margin-top:10px
+}
+.tab-radio{position:absolute;opacity:0;pointer-events:none}
+.view{display:none}
+#tab-today:checked ~ .wrap #todayView,
+#tab-week:checked ~ .wrap #weekView,
+#tab-family:checked ~ .wrap #familyView,
+#tab-month:checked ~ .wrap #monthView,
+#tab-points:checked ~ .wrap #pointsView,
+#tab-settings:checked ~ .wrap #settingsView{display:block}
+.footer{
+  position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);
+  backdrop-filter:blur(12px);border-top:1px solid #e7e7e7;
+  padding:10px 8px max(10px,env(safe-area-inset-bottom));z-index:50
+}
+.footer-inner{max-width:900px;margin:auto;display:flex;gap:5px}
+.nav{
+  flex:1;text-align:center;border-radius:11px;padding:10px 4px;background:#eee;font-size:12px;font-weight:800
+}
+#tab-today:checked ~ .footer label[for=tab-today],
+#tab-week:checked ~ .footer label[for=tab-week],
+#tab-family:checked ~ .footer label[for=tab-family],
+#tab-month:checked ~ .footer label[for=tab-month],
+#tab-points:checked ~ .footer label[for=tab-points],
+#tab-settings:checked ~ .footer label[for=tab-settings]{background:#222;color:#fff}
+.role-badge{display:inline-block;font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:#eee}.private-badge{display:inline-block;font-size:11px;font-weight:800;padding:4px 7px;border-radius:999px;background:#f2eefe;margin-left:5px}
+.hidden-by-role{display:none!important}
+.hidden{display:none!important}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+@media(max-width:650px){
+  .month-toolbar{display:block;margin-bottom:18px}
+  .month-picker-wrap{margin-top:10px}
+  .month-entry-grid{grid-template-columns:1fr;gap:12px}
+  .month-entry-grid #monthDate{grid-column:1}
+  .month-entry-grid #monthTime{grid-column:1}
+  .month-entry-grid #monthItem{grid-column:1}
+  .month-entry-grid #monthPerson{grid-column:1}
+
+  .schedule-head,.schedule-row{grid-template-columns:54px minmax(88px,1fr) 48px 30px 30px 64px;gap:4px}
+  .grid2,.grid3,.grid4{grid-template-columns:1fr}
+  .formrow{grid-template-columns:100px 1fr}
+  .person{padding:4px 3px;font-size:11px}
+  .schedule-head{font-size:10px}
+  .schedule-row{font-size:12px}
+  .schedule-row select{font-size:11px;padding:6px 3px;border-radius:8px;min-width:0;width:100%;justify-self:stretch}
+  .schedule-row input[type=checkbox]{width:19px;height:19px}
+  .schedule-row>div{min-width:0;overflow-wrap:anywhere}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div id="authScreen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:#f6f7f9">
+  <div class="card" style="width:min(440px,100%);margin:0">
+    <h1 style="margin-top:0">Daily Plan</h1>
+    <h2>Family Login</h2>
+    <div class="formrow"><label>Email</label><input id="authEmail" type="email" autocomplete="email"></div>
+    <div class="formrow"><label>Password</label><input id="authPassword" type="password" autocomplete="current-password"></div>
+    <button class="primary" id="signInBtn" style="width:100%;margin-top:8px">ログイン</button>
+    <button class="btn" id="signUpBtn" style="width:100%;margin-top:8px">初回アカウント作成</button>
+    <p class="muted" id="authMessage" style="margin-top:12px"></p>
+    
+  </div>
+</div>
+
+<div id="appShell" class="hidden">
+
+<input class="tab-radio" type="radio" name="mainTab" id="tab-today" checked>
+<input class="tab-radio" type="radio" name="mainTab" id="tab-week">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-family">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-month">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-points">
+<input class="tab-radio" type="radio" name="mainTab" id="tab-settings">
+
+<div class="wrap">
+<h1>Daily Plan</h1>
+
+<section id="todayView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>今日の予定</h2>
+      <span class="pill" id="todayLabel"></span>
+    </div>
+    <div class="tabs" id="todayPersonTabs"></div>
+    <div class="schedule-head">
+      <div>時間</div><div>項目</div><div>名前</div><div>pt</div><div>✓</div><div>承認</div>
+    </div>
+    <div id="todayRows"></div>
+
+    <hr>
+    <button class="btn parent-only" id="toggleTodayEdit">今日だけ変更・追加</button>
+    <div id="todayEditBox" class="hidden parent-only">
+      <h3>今日だけの変更</h3>
+      <div class="grid4">
+        <input id="todayTime" placeholder="時間 例 5:00">
+        <input id="todayItem" placeholder="項目">
+        <select id="todayPerson"></select>
+        <select id="todayApprover"></select>
+      </div>
+      <div class="formrow"><label>ポイント</label><input id="todayPoints" type="number" min="0" step="1" value="0"></div>
+      <label class="parent-only" style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:700">
+        <input id="todayPrivate" type="checkbox" style="width:20px;height:20px">
+        自分だけに表示
+      </label>
+      <button class="primary" id="addTodayOverride" style="margin-top:8px">今日だけ追加</button>
+      <div class="original">
+        <div class="muted">基本スケジュールは消えません。今日だけ追加した予定はここに上乗せされます。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>今日のメモ</h2>
+    <textarea id="dailyMemo" placeholder="持ち物、連絡事項、注意点など"></textarea>
+    <button class="btn" id="saveMemo" style="margin-top:8px">保存</button>
+  </div>
+</section>
+
+<section id="weekView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>基本スケジュール</h2>
+      <span class="pill">月〜日</span>
+    </div>
+    <div class="tabs" id="weekdayTabs"></div>
+    <div class="tabs" id="weekPersonTabs"></div>
+    <div id="weekRows"></div>
+
+    <hr>
+    <h3>基本スケジュールに追加</h3>
+    <div class="grid4">
+      <input id="baseTime" placeholder="時間">
+      <input id="baseItem" placeholder="項目">
+      <select id="basePerson"></select>
+      <select id="baseApprover"></select>
+    </div>
+    <div class="formrow"><label>ポイント</label><input id="basePoints" type="number" min="0" step="1" value="0"></div>
+    <label class="parent-only" style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:700">
+      <input id="basePrivate" type="checkbox" style="width:20px;height:20px">
+      自分だけに表示
+    </label>
+    <button class="primary parent-only" id="addBase" style="margin-top:8px">追加</button>
+  </div>
+</section>
+
+<section id="familyView" class="view">
+  <div class="card">
+    <div class="row-between">
+      <h2>家族の予定</h2>
+      <span class="pill">今日</span>
+    </div>
+    <div class="tabs" id="familyFilterTabs"></div>
+    <div id="familyRows"></div>
+  </div>
+</section>
+
+<section id="monthView" class="view">
+  <div class="card">
+    <div class="month-toolbar">
+      <h2 style="margin:0">月の予定</h2>
+      <div class="month-picker-wrap">
+        <label for="monthPicker">表示月</label>
+        <input id="monthPicker" type="month" style="max-width:180px">
+      </div>
+    </div>
+    <div class="month-entry-grid">
+      <input id="monthDate" type="date" aria-label="日付">
+      <input id="monthTime" type="time" aria-label="時間">
+      <input id="monthItem" placeholder="予定">
+      <select id="monthPerson"></select>
+    </div>
+    <label class="parent-only" style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px;font-weight:700">
+      <input id="monthPrivate" type="checkbox" style="width:20px;height:20px">
+      自分だけに表示
+    </label>
+    <button class="primary parent-only" id="addMonth" style="margin-top:8px">月予定を追加</button>
+    <div id="monthRows" style="margin-top:12px"></div>
+  </div>
+</section>
+
+
+<section id="pointsView" class="view">
+  <div class="card">
+    <h2>ポイントランキング</h2>
+    <div id="pointsRanking" class="ranking-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="row-between">
+      <h2>ポイント詳細</h2>
+      <select id="pointsPerson" style="max-width:180px"></select>
+    </div>
+    <div class="points-summary">
+      <div class="points-box"><div class="muted">現在</div><div class="points-num" id="pointsBalance">0</div><div class="muted">pt</div></div>
+      <div class="points-box"><div class="muted">今月獲得</div><div class="points-num" id="pointsMonth">0</div><div class="muted">pt</div></div>
+      <div class="points-box"><div class="muted">累計獲得</div><div class="points-num" id="pointsTotal">0</div><div class="muted">pt</div></div>
+    </div>
+    <h3>履歴</h3>
+    <div id="pointsHistory" class="points-history"></div>
+  </div>
+
+  <div class="card parent-only">
+    <h2>ポイントを使う</h2>
+    <div class="grid3">
+      <select id="spendPerson"></select>
+      <input id="spendAmount" type="number" min="1" step="1" placeholder="使うポイント">
+      <input id="spendMemo" placeholder="何に使ったか">
+    </div>
+    <button class="primary" id="spendPoints" style="margin-top:8px">ポイントを利用 −</button>
+  </div>
+</section>
+
+<section id="settingsView" class="view">
+  <div class="card admin-only">
+    <h2>ユーザー権限</h2>
+    <div id="roleEditor"></div>
+    <div class="grid3">
+      <input id="roleEmail" type="email" placeholder="ログインメール">
+      <select id="roleType">
+        <option value="admin">管理者</option>
+        <option value="approver">承認者</option>
+        <option value="child">子ども</option>
+        <option value="viewer">閲覧のみ</option>
+      </select>
+      <button class="btn" id="addRole">追加</button>
+    </div>
+    <p class="muted">管理者：全操作／承認者：予定編集・チェック・承認／子ども：閲覧とチェック／閲覧のみ：見るだけ</p>
+  </div>
+
+  <div class="card admin-only">
+    <h2>家族メンバー</h2>
+    <div id="memberEditor"></div>
+    <div class="grid2">
+      <input id="newMember" placeholder="名前">
+      <button class="btn" id="addMember">＋ 家族を追加</button>
+    </div>
+  </div>
+
+  <div class="card admin-only">
+    <h2>承認設定</h2>
+    <div class="formrow"><label>承認者1</label><input id="approver1"></div>
+    <div class="formrow"><label>承認者2</label><input id="approver2"></div>
+        <button class="primary" id="saveApprovers">設定を保存</button>
+    <p class="muted">予定は最初は未承認です。大人が承認者名を選ぶと承認されます。</p>
+  </div>
+
+  <div class="card">
+    <h2>アカウント</h2>
+    <div class="muted" id="currentUserEmail"></div><div style="margin-top:8px"><span id="currentUserRole" class="role-badge">Role: 未設定</span></div>
+    <button class="btn" id="signOutBtn" style="margin-top:10px">ログアウト</button>
+  </div>
+
+  <div class="card">
+    <h2>データ</h2>
+    <button class="danger admin-only" id="resetDemo">家族共有データを初期化</button>
+  </div>
+</section>
+</div>
+
+<div class="footer"><div class="footer-inner">
+<label class="nav" for="tab-today">今日</label>
+<label class="nav" for="tab-week">週間</label>
+<label class="nav" for="tab-family">家族</label>
+<label class="nav" for="tab-month">月</label>
+<label class="nav" for="tab-points">ポイント</label>
+<label class="nav" for="tab-settings">設定</label>
+</div></div>
+
+<script>
+const KEY="daily_plan_clean_v2";
+const dayDefs=[
+  {key:"mon",label:"月",js:1},{key:"tue",label:"火",js:2},{key:"wed",label:"水",js:3},
+  {key:"thu",label:"木",js:4},{key:"fri",label:"金",js:5},{key:"sat",label:"土",js:6},{key:"sun",label:"日",js:0}
+];
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const monthKey=()=>new Date().toISOString().slice(0,7);
+const todayDay=()=>dayDefs.find(d=>d.js===new Date().getDay())?.key || "mon";
+const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
+
+function seed(){
+  const s={
+    members:[],
+    approvers:[],
+    defaultApprover:"未承認",
+    base:{},daily:{},monthly:{},userRoles:{},pointsLedger:[],rewards:[]
+  };
+  for(const d of dayDefs) s.base[d.key]=[];
+  s.daily[todayISO()]={
+    memo:"",
+    done:{},
+    approvals:{},
+    overrides:[]
+  };
+  s.monthly[monthKey()]=[];
+  return s;
+}
+
+const SUPABASE_URL="https://yehlfgqznefpkmraktfp.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_mg5ZgDUJ6VsG5KDpTRL-dw_hHfYOP0D";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+const FAMILY_ID="family-main";
+
+let state=seed();
+let cloudRowId=null;
+let saveTimer=null;
+
+async function loadCloudState(){
+  const { data, error } = await db
+    .from("daily_plan_data")
+    .select("id,data")
+    .eq("family_id", FAMILY_ID)
+    .limit(1)
+    .maybeSingle();
+
+  if(error) throw error;
+
+  if(data){
+    cloudRowId=data.id;
+    state=data.data || seed();
+    ensureRoleState();
+    ensureExtendedState();
+  } else {
+    const initial=seed();
+    const { data:created, error:createError } = await db
+      .from("daily_plan_data")
+      .insert({family_id:FAMILY_ID,data:initial})
+      .select("id,data")
+      .single();
+    if(createError) throw createError;
+    cloudRowId=created.id;
+    state=created.data || initial;
+    ensureExtendedState();
+  }
+}
+
+async function saveNow(){
+  if(!cloudRowId) return;
+  const { error } = await db
+    .from("daily_plan_data")
+    .update({data:state,updated_at:new Date().toISOString()})
+    .eq("id",cloudRowId);
+  if(error){
+    console.error(error);
+    alert("クラウド保存に失敗しました。通信状態を確認してください。");
+  }
+}
+
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(saveNow,250);
+}
+
+function makeId(prefix="i"){
+  if(window.crypto && crypto.randomUUID) return prefix+"_"+crypto.randomUUID();
+  return prefix+"_"+Date.now()+"_"+Math.random().toString(36).slice(2);
+}
+function ensureExtendedState(){
+  if(!Array.isArray(state.pointsLedger)) state.pointsLedger=[];
+  if(!Array.isArray(state.rewards)) state.rewards=[];
+  if(!state.userRoles || typeof state.userRoles!=="object") state.userRoles={};
+  Object.values(state.base||{}).forEach(arr=>(arr||[]).forEach(x=>{if(!x.uid)x.uid=makeId("b");if(x.points==null)x.points=0;}));
+  Object.values(state.daily||{}).forEach(d=>(d.overrides||[]).forEach(x=>{if(!x.uid)x.uid=makeId("o");if(x.points==null)x.points=0;}));
+}
+
+function ensureDaily(){
+  const k=todayISO();
+  if(!state.daily[k]) state.daily[k]={memo:"",done:{},approvals:{},overrides:[]};
+  if(!state.daily[k].overrides) state.daily[k].overrides=[];
+  return state.daily[k];
+}
+let todayFilter="All", weekDay="mon", weekPerson="All", familyFilter="All";
+
+function optionHTML(list,selected){
+  return list.map(x=>`<option ${x===selected?"selected":""}>${esc(x)}</option>`).join("");
+}
+function populateSelects(){
+  const persons=state.members.length ? state.members : ["未設定"];
+  ["todayPerson","basePerson","monthPerson","pointsPerson","spendPerson"].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){
+      const prev=el.value;
+      el.innerHTML=optionHTML(persons,prev && persons.includes(prev)?prev:persons[0]);
+    }
+  });
+  const approverOptions=["未承認",...state.approvers];
+  ["todayApprover","baseApprover"].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.innerHTML=optionHTML(approverOptions,"未承認");
+  });
+}
+function currentUserEmail(){ return (currentSessionUser?.email || "").toLowerCase(); }
+function canUsePrivate(){ return ["admin","approver"].includes(getCurrentRole()); }
+function isVisibleToCurrentUser(item){
+  if(!item?.private) return true;
+  return (item.ownerEmail || "").toLowerCase() === currentUserEmail();
+}
+
+function todayItems(){
+  const base=state.base[todayDay()]||[];
+  const daily=ensureDaily();
+  return [...base.map((x,i)=>({...x,_id:x.uid||("b"+i),_source:"base"})),
+          ...daily.overrides.map((x,i)=>({...x,_id:x.uid||("o"+i),_source:"override"}))]
+    .filter(isVisibleToCurrentUser)
+    .sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
+}
+function renderPersonTabs(id,current,setter){
+  const el=document.getElementById(id);
+  const vals=["All",...state.members];
+  el.innerHTML=vals.map(x=>`<button class="tabbtn ${x===current?"active":""}" data-v="${esc(x)}">${x==="All"?"全員":esc(x)}</button>`).join("");
+  el.querySelectorAll("button").forEach(b=>b.onclick=()=>setter(b.dataset.v));
+}
+function renderToday(){
+  const d=dayDefs.find(x=>x.key===todayDay());
+  document.getElementById("todayLabel").textContent=d.label+"曜日";
+  renderPersonTabs("todayPersonTabs",todayFilter,v=>{todayFilter=v;renderToday()});
+  const daily=ensureDaily();
+  let items=todayItems();
+  if(todayFilter!=="All") items=items.filter(x=>x.person===todayFilter);
+  const box=document.getElementById("todayRows");
+  box.innerHTML=items.length?items.map(x=>{
+    const done=!!daily.done[x._id];
+    const appr=daily.approvals[x._id] ?? x.approver ?? "未承認";
+    return `<div class="schedule-row ${done?"done":""}">
+      <div>${esc(x.time||"—")}</div>
+      <div><b>${esc(x.item)}</b>${x.private?'<span class="private-badge">自分だけ</span>':""}${x._source==="override"?'<div class="muted">今日だけ</div>':""}</div>
+      <div class="person">${esc(x.person)}</div>
+      <div><b>${Number(x.points)||0}</b></div>
+      <input type="checkbox" ${done?"checked":""} onchange="setDone('${x._id}',this.checked)">
+      <select onchange="setApproval('${x._id}',this.value)">${optionHTML([...state.approvers,"未承認"],appr)}</select>
+    </div>`
+  }).join(""):`<div class="muted" style="padding:14px 0">予定はありません。</div>`;
+  document.getElementById("dailyMemo").value=daily.memo||"";
+}
+function syncTaskPoints(id){
+  ensureExtendedState();
+  const daily=ensureDaily();
+  const item=todayItems().find(x=>x._id===id);
+  if(!item || !item.person || item.person==="Family" || Number(item.points||0)<=0) return;
+  const ledgerId="task:"+todayISO()+":"+id;
+  const qualifies=!!daily.done[id] && (daily.approvals[id] ?? item.approver ?? "未承認")!=="未承認";
+  const idx=state.pointsLedger.findIndex(x=>x.ledgerId===ledgerId);
+  if(qualifies && idx<0){
+    state.pointsLedger.push({ledgerId,person:item.person,points:Number(item.points)||0,type:"earn",label:item.item,date:todayISO(),createdAt:new Date().toISOString()});
+  }else if(!qualifies && idx>=0){
+    state.pointsLedger.splice(idx,1);
+  }
+}
+window.setDone=(id,val)=>{
+  if(getCurrentRole()==="viewer") return alert("閲覧のみのアカウントです");
+  ensureDaily().done[id]=val;syncTaskPoints(id);save();renderToday();renderFamily();renderPoints();applyPermissions();
+};
+window.setApproval=(id,val)=>{
+  if(!["admin","approver"].includes(getCurrentRole())) return alert("承認権限がありません");
+  ensureDaily().approvals[id]=val;syncTaskPoints(id);save();renderToday();renderFamily();renderPoints();applyPermissions();
+};
+
+function renderWeek(){
+  const tabs=document.getElementById("weekdayTabs");
+  tabs.innerHTML=dayDefs.map(d=>`<button class="tabbtn ${d.key===weekDay?"active":""}" data-day="${d.key}">${d.label}</button>`).join("");
+  tabs.querySelectorAll("button").forEach(b=>b.onclick=()=>{weekDay=b.dataset.day;renderWeek()});
+  renderPersonTabs("weekPersonTabs",weekPerson,v=>{weekPerson=v;renderWeek()});
+  let arr=(state.base[weekDay]||[]).filter(isVisibleToCurrentUser);
+  if(weekPerson!=="All") arr=arr.filter(x=>x.person===weekPerson);
+  document.getElementById("weekRows").innerHTML=arr.length?arr.map((x,i)=>`
+    <div class="schedule-row">
+      <div>${esc(x.time||"—")}</div>
+      <div><b>${esc(x.item)}</b></div>
+      <div class="person">${esc(x.person)}</div>
+      <div><b>${Number(x.points)||0}</b></div>
+      <div></div>
+      <div><button class="small danger parent-only" onclick="deleteBase('${x.uid}')">削除</button></div>
+    </div>`).join(""):`<div class="muted" style="padding:14px 0">この曜日の基本予定はありません。</div>`;
+}
+window.deleteBase=uid=>{
+  if(!["admin","approver"].includes(getCurrentRole())) return alert("編集権限がありません");
+  const arr=state.base[weekDay]||[];
+  const idx=arr.findIndex(x=>x.uid===uid);
+  if(idx>=0) arr.splice(idx,1);
+  save();renderWeek();renderToday();renderFamily();
+};
+
+function renderFamily(){
+  renderPersonTabs("familyFilterTabs",familyFilter,v=>{familyFilter=v;renderFamily()});
+  let arr=todayItems();
+  if(familyFilter!=="All") arr=arr.filter(x=>x.person===familyFilter);
+  const daily=ensureDaily();
+  document.getElementById("familyRows").innerHTML=arr.length?arr.map(x=>{
+    const appr=daily.approvals[x._id] ?? x.approver ?? "未承認";
+    return `<div class="family-item">
+      <input type="checkbox" ${daily.done[x._id]?"checked":""} onchange="setDone('${x._id}',this.checked)">
+      <div>
+        <b>${esc(x.time||"—")}　${esc(x.item)}</b>${Number(x.points||0)>0?`<span class="point-pill">${Number(x.points)} pt</span>`:""}
+        <div class="muted"><span class="badge">${esc(x.person)}</span>${esc(appr)}</div>
+      </div>
+      <span class="${appr==="未承認"?"unapproved":"approved"}">${esc(appr)}</span>
+    </div>`
+  }).join(""):`<div class="muted">予定はありません。</div>`;
+}
+
+function renderMonth(){
+  const picker=document.getElementById("monthPicker");
+  if(!picker.value) picker.value=monthKey();
+  const k=picker.value;
+  if(!state.monthly[k]) state.monthly[k]=[];
+  const arr=(state.monthly[k]||[]).filter(isVisibleToCurrentUser);
+  document.getElementById("monthRows").innerHTML=arr.length?arr.map((x,i)=>`
+    <div class="month-item ${x.done?"done":""}">
+      <input type="checkbox" ${x.done?"checked":""} onchange="toggleMonth(${i},this.checked)">
+      <div><b>${esc(x.item)}</b><div class="muted"><span class="badge">${esc(x.person)}</span>${x.date?esc(x.date):"日付未定"}${x.time?"　"+esc(x.time):"　時間未定"}</div></div>
+      <button class="small danger" onclick="deleteMonth(${i})">削除</button>
+    </div>`).join(""):`<div class="muted" style="padding:14px 0">この月の予定はありません。</div>`;
+}
+window.toggleMonth=(i,v)=>{const k=document.getElementById("monthPicker").value;state.monthly[k][i].done=v;save();renderMonth()};
+window.deleteMonth=i=>{const k=document.getElementById("monthPicker").value;state.monthly[k].splice(i,1);save();renderMonth()};
+
+
+let currentSessionUser=null;
+
+function ensureRoleState(){
+  if(!state.userRoles || typeof state.userRoles!=="object") state.userRoles={};
+}
+
+function roleLabel(role){
+  return ({admin:"管理者",approver:"承認者",child:"子ども",viewer:"閲覧のみ"})[role] || "未設定";
+}
+
+function getCurrentRole(){
+  ensureRoleState();
+  const email=(currentSessionUser?.email || "").toLowerCase();
+  return state.userRoles[email] || (Object.keys(state.userRoles).length===0 ? "admin" : "viewer");
+}
+
+function applyPermissions(){
+  const role=getCurrentRole();
+  const badge=document.getElementById("currentUserRole");
+  if(badge) badge.textContent="Role: "+roleLabel(role);
+
+  document.querySelectorAll(".admin-only").forEach(el=>{
+    el.classList.toggle("hidden-by-role",role!=="admin");
+  });
+  document.querySelectorAll(".parent-only").forEach(el=>{
+    el.classList.toggle("hidden-by-role",!["admin","approver"].includes(role));
+  });
+
+  document.querySelectorAll(".schedule-row select").forEach(el=>{
+    el.disabled=!["admin","approver"].includes(role);
+  });
+  document.querySelectorAll(".schedule-row input[type=checkbox], .family-item input[type=checkbox]").forEach(el=>{
+    el.disabled=(role==="viewer");
+  });
+}
+
+function renderRoleEditor(){
+  ensureRoleState();
+  const box=document.getElementById("roleEditor");
+  if(!box) return;
+  const rows=Object.entries(state.userRoles);
+  box.innerHTML=rows.length?rows.map(([email,role])=>`
+    <div class="formrow">
+      <label>${esc(email)}</label>
+      <div class="grid2">
+        <select onchange="changeUserRole('${esc(email)}',this.value)">
+          <option value="admin" ${role==="admin"?"selected":""}>管理者</option>
+          <option value="approver" ${role==="approver"?"selected":""}>承認者</option>
+          <option value="child" ${role==="child"?"selected":""}>子ども</option>
+          <option value="viewer" ${role==="viewer"?"selected":""}>閲覧のみ</option>
+        </select>
+        <button class="small danger" onclick="removeUserRole('${esc(email)}')">削除</button>
+      </div>
+    </div>`).join("")
+    : '<div class="muted" style="padding:8px 0">最初にログインしたユーザーが管理者になります。</div>';
+}
+
+window.changeUserRole=(email,role)=>{
+  if(getCurrentRole()!=="admin") return;
+  state.userRoles[email.toLowerCase()]=role;
+  save();renderRoleEditor();applyPermissions();
+};
+
+window.removeUserRole=email=>{
+  if(getCurrentRole()!=="admin") return;
+  delete state.userRoles[email.toLowerCase()];
+  save();renderRoleEditor();applyPermissions();
+};
+
+
+
+function personLedger(person){
+  ensureExtendedState();
+  return state.pointsLedger.filter(x=>x.person===person);
+}
+function pointStats(person){
+  const ledger=personLedger(person);
+  const earned=ledger.filter(x=>x.type==="earn").reduce((a,x)=>a+Number(x.points||0),0);
+  const spent=ledger.filter(x=>x.type==="spend").reduce((a,x)=>a+Math.abs(Number(x.points||0)),0);
+  const monthEarn=ledger.filter(x=>x.type==="earn" && String(x.date||"").startsWith(monthKey())).reduce((a,x)=>a+Number(x.points||0),0);
+  return {earned,spent,balance:earned-spent,monthEarn};
+}
+function renderPoints(){
+  ensureExtendedState();
+  const people=state.members.length?state.members:["未設定"];
+  const sel=document.getElementById("pointsPerson");
+  if(!sel)return;
+
+  const rankingBox=document.getElementById("pointsRanking");
+  const realPeople=state.members.filter(x=>x && x!=="未設定");
+  const ranked=realPeople.map(person=>({person,...pointStats(person)}))
+    .sort((a,b)=>b.balance-a.balance || b.earned-a.earned || a.person.localeCompare(b.person));
+
+  if(rankingBox){
+    rankingBox.innerHTML=ranked.length?ranked.map((r,i)=>{
+      const medal=i===0?"🥇":i===1?"🥈":i===2?"🥉":String(i+1);
+      return `<div class="ranking-row" onclick="document.getElementById('pointsPerson').value='${esc(r.person)}';renderPoints()" style="cursor:pointer">
+        <div class="rank-num">${medal}</div>
+        <div><b>${esc(r.person)}</b><div class="muted">累計獲得 ${r.earned} pt</div></div>
+        <div class="rank-points">${r.balance} pt</div>
+      </div>`;
+    }).join(""):'<div class="muted" style="padding:10px 0">家族メンバーを設定してください。</div>';
+  }
+
+  if(!sel.value || !people.includes(sel.value)) sel.value=people[0];
+  const person=sel.value;
+
+  if(person==="未設定"){
+    document.getElementById("pointsBalance").textContent="0";
+    document.getElementById("pointsMonth").textContent="0";
+    document.getElementById("pointsTotal").textContent="0";
+    document.getElementById("pointsHistory").innerHTML='<div class="muted" style="padding:10px 0">家族メンバーを設定してください。</div>';
+    return;
+  }
+
+  const s=pointStats(person);
+  document.getElementById("pointsBalance").textContent=s.balance;
+  document.getElementById("pointsMonth").textContent=s.monthEarn;
+  document.getElementById("pointsTotal").textContent=s.earned;
+
+  const ledger=personLedger(person).slice().sort((a,b)=>String(b.createdAt||b.date).localeCompare(String(a.createdAt||a.date)));
+  document.getElementById("pointsHistory").innerHTML=ledger.length?ledger.map(x=>`
+    <div class="points-history-row">
+      <div><b>${esc(x.label||"ポイント")}</b><div class="muted">${esc(x.date||"")}</div></div>
+      <div><b>${x.type==="spend"?"−":"+"}${Math.abs(Number(x.points||0))} pt</b></div>
+    </div>`).join(""):'<div class="muted" style="padding:10px 0">まだ履歴はありません。</div>';
+
+  applyPermissions();
+}
+
+function renderSettings(){
+  ensureRoleState();
+  renderRoleEditor();
+  document.getElementById("memberEditor").innerHTML=state.members.map((m,i)=>`
+    <div class="formrow"><label>家族 ${i+1}</label><div class="grid2"><input value="${esc(m)}" onchange="renameMember(${i},this.value)"><button class="small danger" onclick="removeMember(${i})">削除</button></div></div>
+  `).join("");
+  document.getElementById("approver1").value=state.approvers[0]||"";
+  document.getElementById("approver2").value=state.approvers[1]||"";
+    applyPermissions();
+}
+window.renameMember=(i,v)=>{
+  const old=state.members[i], nv=v.trim()||old;
+  state.members[i]=nv;
+  Object.values(state.base).flat().forEach(x=>{if(x.person===old)x.person=nv});
+  Object.values(state.daily).forEach(d=>d.overrides?.forEach(x=>{if(x.person===old)x.person=nv}));
+  Object.values(state.monthly).flat().forEach(x=>{if(x.person===old)x.person=nv});
+  (state.pointsLedger||[]).forEach(x=>{if(x.person===old)x.person=nv});
+  (state.rewards||[]).forEach(x=>{if(x.person===old)x.person=nv});
+  save();populateSelects();renderToday();renderWeek();renderFamily();renderMonth();renderPoints();renderSettings();
+};
+window.removeMember=i=>{if(state.members.length<=1)return; state.members.splice(i,1);save();populateSelects();renderSettings()};
+
+document.getElementById("toggleTodayEdit").onclick=()=>document.getElementById("todayEditBox").classList.toggle("hidden");
+document.getElementById("addTodayOverride").onclick=()=>{
+  if(!["admin","approver"].includes(getCurrentRole())) return alert("編集権限がありません");
+  const item=document.getElementById("todayItem").value.trim(); if(!item)return alert("項目を入力してください");
+  ensureDaily().overrides.push({
+    time:document.getElementById("todayTime").value.trim(),
+    item,person:document.getElementById("todayPerson").value==="未設定" ? "" : document.getElementById("todayPerson").value,
+    approver:"未承認",
+    points:Math.max(0,Number(document.getElementById("todayPoints").value)||0),
+    uid:makeId("o"),
+    private:canUsePrivate() && document.getElementById("todayPrivate").checked,
+    ownerEmail:currentUserEmail()
+  });
+  document.getElementById("todayItem").value=""; document.getElementById("todayTime").value=""; document.getElementById("todayPoints").value="0"; document.getElementById("todayPrivate").checked=false;
+  save();renderToday();renderFamily();
+};
+document.getElementById("saveMemo").onclick=()=>{ensureDaily().memo=document.getElementById("dailyMemo").value;save();alert("保存しました")};
+document.getElementById("addBase").onclick=()=>{
+  if(!["admin","approver"].includes(getCurrentRole())) return alert("編集権限がありません");
+  const item=document.getElementById("baseItem").value.trim(); if(!item)return alert("項目を入力してください");
+  state.base[weekDay].push({
+    time:document.getElementById("baseTime").value.trim(),
+    item,person:document.getElementById("basePerson").value==="未設定" ? "" : document.getElementById("basePerson").value,
+    approver:"未承認",
+    points:Math.max(0,Number(document.getElementById("basePoints").value)||0),
+    uid:makeId("b"),
+    private:canUsePrivate() && document.getElementById("basePrivate").checked,
+    ownerEmail:currentUserEmail()
+  });
+  document.getElementById("baseItem").value="";document.getElementById("baseTime").value="";document.getElementById("basePoints").value="0";document.getElementById("basePrivate").checked=false;
+  save();renderWeek();renderToday();renderFamily();
+};
+document.getElementById("addMonth").onclick=()=>{
+  if(!["admin","approver"].includes(getCurrentRole())) return alert("編集権限がありません");
+  const item=document.getElementById("monthItem").value.trim();if(!item)return alert("予定を入力してください");
+  const k=document.getElementById("monthPicker").value||monthKey(); if(!state.monthly[k])state.monthly[k]=[];
+  state.monthly[k].push({
+    date:document.getElementById("monthDate").value,
+    time:document.getElementById("monthTime").value,
+    item,
+    person:document.getElementById("monthPerson").value==="未設定" ? "" : document.getElementById("monthPerson").value,
+    done:false,
+    private:canUsePrivate() && document.getElementById("monthPrivate").checked,
+    ownerEmail:currentUserEmail()
+  });
+  document.getElementById("monthItem").value="";document.getElementById("monthDate").value="";document.getElementById("monthTime").value="";document.getElementById("monthPrivate").checked=false;
+  save();renderMonth();
+};
+
+document.getElementById("addRole").onclick=()=>{
+  if(getCurrentRole()!=="admin") return alert("管理者権限が必要です");
+  const email=document.getElementById("roleEmail").value.trim().toLowerCase();
+  const role=document.getElementById("roleType").value;
+  if(!email) return alert("メールアドレスを入力してください");
+  ensureRoleState();
+  state.userRoles[email]=role;
+  document.getElementById("roleEmail").value="";
+  save();renderRoleEditor();applyPermissions();
+};
+
+
+document.getElementById("pointsPerson").onchange=renderPoints;
+document.getElementById("spendPoints").onclick=()=>{
+  if(!["admin","approver"].includes(getCurrentRole())) return alert("ポイント利用は大人が行ってください");
+  ensureExtendedState();
+  const person=document.getElementById("spendPerson").value;
+  const amount=Math.max(0,Number(document.getElementById("spendAmount").value)||0);
+  const memo=document.getElementById("spendMemo").value.trim()||"ポイント利用";
+  if(!person || person==="未設定" || amount<=0)return alert("誰が何ポイント使うか入力してください");
+  if(pointStats(person).balance<amount)return alert("ポイントが足りません");
+  state.pointsLedger.push({ledgerId:makeId("spend"),person,points:amount,type:"spend",label:memo,date:todayISO(),createdAt:new Date().toISOString()});
+  document.getElementById("spendAmount").value="";
+  document.getElementById("spendMemo").value="";
+  document.getElementById("pointsPerson").value=person;
+  save();renderPoints();
+};
+
+document.getElementById("monthPicker").onchange=renderMonth;
+document.getElementById("addMember").onclick=()=>{
+  if(getCurrentRole()!=="admin") return alert("管理者権限が必要です");
+  const v=document.getElementById("newMember").value.trim();if(!v)return;
+  state.members.push(v);document.getElementById("newMember").value="";save();populateSelects();renderSettings()
+};
+document.getElementById("saveApprovers").onclick=()=>{
+  if(getCurrentRole()!=="admin") return alert("管理者権限が必要です");
+  const a1=document.getElementById("approver1").value.trim(),a2=document.getElementById("approver2").value.trim();
+  state.approvers=[a1,a2].filter(Boolean);
+  state.defaultApprover="未承認";
+  save();populateSelects();renderSettings();renderToday();alert("承認設定を保存しました");
+};
+document.getElementById("resetDemo").onclick=()=>{if(confirm("家族共有データを初期化しますか？")){state=seed();save();populateSelects();renderToday();renderWeek();renderFamily();renderMonth();renderPoints();renderSettings();}};
+
+
+async function renderAll(){
+  ensureExtendedState();
+  populateSelects();
+  renderToday();
+  renderWeek();
+  renderFamily();
+  renderMonth();
+  renderPoints();
+  renderSettings();
+}
+
+async function startApp(session){
+  document.getElementById("authScreen").classList.add("hidden");
+  document.getElementById("appShell").classList.remove("hidden");
+  currentSessionUser=session?.user || null;
+  document.getElementById("currentUserEmail").textContent = currentSessionUser?.email || "";
+  try{
+    await loadCloudState();
+    ensureRoleState();
+    if(Object.keys(state.userRoles).length===0 && currentSessionUser?.email){
+      state.userRoles[currentSessionUser.email.toLowerCase()]="admin";
+      await saveNow();
+    }
+    await renderAll();
+    applyPermissions();
+  }catch(e){
+    console.error(e);
+    alert("クラウドデータの読み込みに失敗しました。");
+  }
+}
+
+document.getElementById("signInBtn").onclick=async()=>{
+  const email=document.getElementById("authEmail").value.trim();
+  const password=document.getElementById("authPassword").value;
+  const msg=document.getElementById("authMessage");
+  msg.textContent="ログイン中…";
+  const {data,error}=await db.auth.signInWithPassword({email,password});
+  if(error){ msg.textContent=error.message; return; }
+  msg.textContent="";
+  await startApp(data.session);
+};
+
+document.getElementById("signUpBtn").onclick=async()=>{
+  const email=document.getElementById("authEmail").value.trim();
+  const password=document.getElementById("authPassword").value;
+  const msg=document.getElementById("authMessage");
+  if(!email || password.length<6){
+    msg.textContent="メールアドレスと6文字以上のパスワードを入力してください。";
+    return;
+  }
+  msg.textContent="アカウント作成中…";
+  const {data,error}=await db.auth.signUp({email,password});
+  if(error){ msg.textContent=error.message; return; }
+  if(data.session){
+    msg.textContent="";
+    await startApp(data.session);
+  }else{
+    msg.textContent="確認メールを送りました。メール内のリンクを開いてからログインしてください。";
+  }
+};
+
+document.getElementById("signOutBtn").onclick=async()=>{
+  await db.auth.signOut();
+  location.reload();
+};
+
+db.auth.onAuthStateChange(async(event,session)=>{
+  if(event==="SIGNED_OUT"){
+    document.getElementById("appShell").classList.add("hidden");
+    document.getElementById("authScreen").classList.remove("hidden");
+  }
+});
+
+(async()=>{
+  const {data:{session}}=await db.auth.getSession();
+  if(session){
+    await startApp(session);
+  }else{
+    document.getElementById("authScreen").classList.remove("hidden");
+    document.getElementById("appShell").classList.add("hidden");
+  }
+})();
+
+</script>
+</div>
+</body>
+</html>
